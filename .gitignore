@@ -1,0 +1,35 @@
+# Project plan — non public access
+APP_PLAN.md
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Node / Nuxt
+node_modules/
+.nuxt/
+.output/
+dist/
+*.local
+
+# Rust
+target/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Jitsi local config (secrets)
+jitsi/.env
+jitsi/web/config.js
