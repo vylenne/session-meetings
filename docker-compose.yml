@@ -1,0 +1,44 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: session_meeting
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app -d session_meeting"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: ./backend
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://app:${DB_PASSWORD}@postgres/session_meeting
+      APP_JWT_SECRET: ${APP_JWT_SECRET}
+      JITSI_JWT_APP_ID: ${JWT_APP_ID}
+      JITSI_JWT_APP_SECRET: ${JWT_APP_SECRET}
+      JITSI_DOMAIN: ${JITSI_DOMAIN}
+    ports:
+      - "8080:8080"
+
+  frontend:
+    build: ./frontend
+    depends_on:
+      backend:
+        condition: service_started
+    environment:
+      NUXT_PUBLIC_API_BASE: http://backend:8080
+      NUXT_PUBLIC_JITSI_DOMAIN: ${JITSI_DOMAIN}
+    ports:
+      - "3000:3000"
+
+volumes:
+  pgdata:

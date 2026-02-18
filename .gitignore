@@ -4,7 +4,6 @@ APP_PLAN.md
 # Environment
 .env
 .env.*
-!.env.example
 
 # Node / Nuxt
 node_modules/
