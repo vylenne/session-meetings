@@ -12,3 +12,14 @@ pub struct Invitation {
     pub expires_at: DateTime<Utc>,
     pub created_at: DateTime<Utc>,
 }
+
+#[derive(Debug, Serialize)]
+pub struct InviteResponse {
+    pub room_name: String,
+    pub jitsi_jwt: String,
+}
+
+#[derive(Debug, Serialize)]
+pub struct InviteRedirect {
+    pub redirect: String,
+}

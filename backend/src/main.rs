@@ -49,6 +49,16 @@ async fn main() -> std::io::Result<()> {
                     .route("/login", web::post().to(handlers::auth::login))
                     .route("/me", web::get().to(handlers::auth::me)),
             )
+            .service(
+                web::scope("/api/meetings")
+                    .route("", web::post().to(handlers::meetings::create))
+                    .route("", web::get().to(handlers::meetings::list))
+                    .route("/{id}", web::get().to(handlers::meetings::get_one)),
+            )
+            .service(
+                web::scope("/api/invite")
+                    .route("/{token}", web::get().to(handlers::invitations::validate_invite)),
+            )
     })
     .bind(("0.0.0.0", 8080))?
     .run()
