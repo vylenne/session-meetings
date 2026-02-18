@@ -9,7 +9,7 @@ if (import.meta.client && isAuthenticated.value) {
 </script>
 
 <template>
-  <div class="min-h-screen flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-950 px-4">
+  <div class="min-h-screen min-h-dvh flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-950 px-4">
     <div class="text-center max-w-lg">
       <h1 class="text-4xl font-bold mb-3">Session Meeting</h1>
       <p class="text-lg text-gray-500 dark:text-gray-400 mb-8">

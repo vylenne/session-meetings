@@ -42,34 +42,17 @@ async function onSubmit() {
 
       <form class="space-y-4" @submit.prevent="onSubmit">
         <UFormField label="Email">
-          <UInput
-            v-model="form.email"
-            type="email"
-            placeholder="you@example.com"
-            required
-            icon="i-lucide-mail"
-            size="lg"
-          />
+          <UInput v-model="form.email" type="email" placeholder="you@example.com" required
+            icon="i-lucide-mail" size="lg" class="w-full" />
         </UFormField>
 
         <UFormField label="Пароль">
-          <UInput
-            v-model="form.password"
-            type="password"
-            placeholder="Минимум 8 символов"
-            required
-            icon="i-lucide-lock"
-            size="lg"
-          />
+          <UInput v-model="form.password" type="password" placeholder="Минимум 8 символов" required
+            icon="i-lucide-lock" size="lg" class="w-full" />
         </UFormField>
 
-        <UAlert
-          v-if="error"
-          color="error"
-          variant="subtle"
-          :title="error"
-          icon="i-lucide-circle-alert"
-        />
+        <UAlert v-if="error" color="error" variant="subtle" :title="error"
+          icon="i-lucide-circle-alert" />
 
         <UButton type="submit" block size="lg" :loading="loading">
           Войти
