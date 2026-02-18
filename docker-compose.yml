@@ -28,6 +28,9 @@ services:
       JITSI_DOMAIN: ${JITSI_DOMAIN}
     ports:
       - "8080:8080"
+    networks:
+      - default
+      - jitsi
 
   frontend:
     build: ./frontend
@@ -39,6 +42,11 @@ services:
       NUXT_PUBLIC_JITSI_DOMAIN: ${JITSI_DOMAIN}
     ports:
       - "3000:3000"
+
+networks:
+  jitsi:
+    name: session-meeting
+    external: true
 
 volumes:
   pgdata:

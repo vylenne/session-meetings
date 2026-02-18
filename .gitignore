@@ -32,3 +32,4 @@ npm-debug.log*
 # Jitsi local config (secrets)
 jitsi/.env
 jitsi/web/config.js
+jitsi/.jitsi-meet-cfg/
