@@ -6,4 +6,11 @@ export default defineNuxtConfig({
   typescript: {
     strict: true,
   },
+  modules: ["@nuxt/ui", "@pinia/nuxt"],
+  runtimeConfig: {
+    public: {
+      apiBase: "http://localhost:8080",
+      jitsiDomain: "localhost:8443",
+    },
+  },
 });

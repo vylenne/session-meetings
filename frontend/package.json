@@ -13,7 +13,10 @@
     "typecheck": "nuxt typecheck"
   },
   "dependencies": {
+    "@nuxt/ui": "^4.4.0",
+    "@pinia/nuxt": "^0.11.3",
     "nuxt": "^4.0.0",
+    "pinia": "^3.0.4",
     "vue": "latest",
     "vue-router": "latest"
   },
