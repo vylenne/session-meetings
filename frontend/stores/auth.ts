@@ -25,7 +25,9 @@ export const useAuthStore = defineStore("auth", () => {
     if (!token.value) return;
     try {
       const { $api } = useNuxtApp();
-      user.value = await $api<User>("/api/auth/me");
+      user.value = await $api<User>("/api/auth/me", {
+        headers: { Authorization: `Bearer ${token.value}` },
+      });
     } catch {
       logout();
     }

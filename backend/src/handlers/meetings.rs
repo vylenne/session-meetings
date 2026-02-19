@@ -29,7 +29,7 @@ pub async fn create(
     .fetch_one(pool.get_ref())
     .await?;
 
-    let _invitation = sqlx::query_as::<_, Invitation>(
+    sqlx::query_as::<_, Invitation>(
         "INSERT INTO invitations (meeting_id, token, created_by, expires_at) VALUES ($1, $2, $3, $4) RETURNING *",
     )
     .bind(meeting.id)
@@ -44,7 +44,8 @@ pub async fn create(
         .fetch_one(pool.get_ref())
         .await?;
 
-    let jitsi_jwt = jwt::create_jitsi_token(&room_name, &user.name, &user.email, config.get_ref())?;
+    let jitsi_jwt =
+        jwt::create_jitsi_token(&room_name, &user.name, &user.email, config.get_ref())?;
     let invite_url = format!("/join/{invite_token}");
 
     Ok(HttpResponse::Created().json(MeetingResponse {
@@ -115,27 +116,56 @@ pub async fn get_one(
     .await?
     .ok_or_else(|| ApiError::NotFound("Meeting not found".into()))?;
 
+    build_meeting_response(&meeting, auth.user_id, pool.get_ref(), config.get_ref()).await
+}
+
+pub async fn get_by_room(
+    pool: web::Data<PgPool>,
+    config: web::Data<AppConfig>,
+    auth: AuthenticatedUser,
+    path: web::Path<String>,
+) -> Result<HttpResponse, ApiError> {
+    let room_name = path.into_inner();
+
+    let meeting = sqlx::query_as::<_, Meeting>(
+        "SELECT * FROM meetings WHERE room_name = $1",
+    )
+    .bind(&room_name)
+    .fetch_optional(pool.get_ref())
+    .await?
+    .ok_or_else(|| ApiError::NotFound("Meeting not found".into()))?;
+
+    build_meeting_response(&meeting, auth.user_id, pool.get_ref(), config.get_ref()).await
+}
+
+async fn build_meeting_response(
+    meeting: &Meeting,
+    user_id: Uuid,
+    pool: &PgPool,
+    config: &AppConfig,
+) -> Result<HttpResponse, ApiError> {
     let invitation = sqlx::query_as::<_, Invitation>(
         "SELECT * FROM invitations WHERE meeting_id = $1 ORDER BY created_at DESC LIMIT 1",
     )
     .bind(meeting.id)
-    .fetch_optional(pool.get_ref())
+    .fetch_optional(pool)
     .await?;
 
     let user = sqlx::query_as::<_, User>("SELECT * FROM users WHERE id = $1")
-        .bind(auth.user_id)
-        .fetch_one(pool.get_ref())
+        .bind(user_id)
+        .fetch_one(pool)
         .await?;
 
-    let jitsi_jwt = jwt::create_jitsi_token(&meeting.room_name, &user.name, &user.email, config.get_ref())?;
+    let jitsi_jwt =
+        jwt::create_jitsi_token(&meeting.room_name, &user.name, &user.email, config)?;
     let invite_url = invitation
         .map(|inv| format!("/join/{}", inv.token))
         .unwrap_or_default();
 
     Ok(HttpResponse::Ok().json(MeetingResponse {
         id: meeting.id,
-        room_name: meeting.room_name,
-        title: meeting.title,
+        room_name: meeting.room_name.clone(),
+        title: meeting.title.clone(),
         jitsi_jwt,
         invite_url,
         created_at: meeting.created_at,

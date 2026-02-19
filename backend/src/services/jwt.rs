@@ -70,7 +70,7 @@ pub fn create_jitsi_token(
     let now = Utc::now();
     let claims = JitsiClaims {
         iss: config.jitsi_jwt_app_id.clone(),
-        sub: config.jitsi_domain.clone(),
+        sub: config.jitsi_xmpp_domain.clone(),
         aud: config.jitsi_jwt_app_id.clone(),
         room: room_name.to_string(),
         iat: now.timestamp() as usize,

@@ -26,6 +26,7 @@ services:
       JITSI_JWT_APP_ID: ${JWT_APP_ID}
       JITSI_JWT_APP_SECRET: ${JWT_APP_SECRET}
       JITSI_DOMAIN: ${JITSI_DOMAIN}
+      JITSI_XMPP_DOMAIN: ${JITSI_XMPP_DOMAIN:-meet.jitsi}
     ports:
       - "8080:8080"
     networks:
@@ -38,7 +39,8 @@ services:
       backend:
         condition: service_started
     environment:
-      NUXT_PUBLIC_API_BASE: http://backend:8080
+      NUXT_API_BASE_INTERNAL: http://backend:8080
+      NUXT_PUBLIC_API_BASE: http://localhost:8080
       NUXT_PUBLIC_JITSI_DOMAIN: ${JITSI_DOMAIN}
     ports:
       - "3000:3000"

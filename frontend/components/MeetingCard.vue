@@ -7,10 +7,19 @@ interface Meeting {
   created_at: string;
 }
 
+interface MeetingDetail {
+  id: string;
+  room_name: string;
+  title: string | null;
+  jitsi_jwt: string;
+  invite_url: string;
+  created_at: string;
+}
+
 const props = defineProps<{ meeting: Meeting }>();
 
-const copied = ref(false);
-const toast = useToast();
+const api = useApi();
+const joining = ref(false);
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleString("ru-RU", {
@@ -22,15 +31,15 @@ function formatDate(iso: string) {
   });
 }
 
-async function copyInvite() {
+async function joinMeeting() {
+  joining.value = true;
   try {
-    const url = `${window.location.origin}/join/${props.meeting.invite_url}`;
-    await navigator.clipboard.writeText(url);
-    copied.value = true;
-    toast.add({ title: "Ссылка скопирована", color: "success" });
-    setTimeout(() => (copied.value = false), 2000);
+    const data = await api<MeetingDetail>(
+      `/api/meetings/${props.meeting.id}`,
+    );
+    navigateTo(`/meeting/${data.room_name}?jwt=${data.jitsi_jwt}`);
   } catch {
-    toast.add({ title: "Не удалось скопировать", color: "error" });
+    joining.value = false;
   }
 }
 </script>
@@ -47,18 +56,12 @@ async function copyInvite() {
         </p>
       </div>
       <div class="flex gap-2 shrink-0">
-        <UButton
-          :icon="copied ? 'i-lucide-check' : 'i-lucide-link'"
-          variant="soft"
-          size="sm"
-          @click="copyInvite"
-        >
-          {{ copied ? "Скопировано" : "Ссылка" }}
-        </UButton>
+        <InviteLink :invite-url="meeting.invite_url" />
         <UButton
           icon="i-lucide-video"
           size="sm"
-          :to="`/meeting/${meeting.room_name}`"
+          :loading="joining"
+          @click="joinMeeting"
         >
           Войти
         </UButton>

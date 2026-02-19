@@ -7,6 +7,7 @@ pub struct AppConfig {
     pub jitsi_jwt_app_id: String,
     pub jitsi_jwt_app_secret: String,
     pub jitsi_domain: String,
+    pub jitsi_xmpp_domain: String,
 }
 
 impl AppConfig {
@@ -17,6 +18,7 @@ impl AppConfig {
             jitsi_jwt_app_id: env::var("JITSI_JWT_APP_ID").unwrap_or_else(|_| "session_meeting".into()),
             jitsi_jwt_app_secret: env::var("JITSI_JWT_APP_SECRET").expect("JITSI_JWT_APP_SECRET must be set"),
             jitsi_domain: env::var("JITSI_DOMAIN").unwrap_or_else(|_| "meet.localhost".into()),
+            jitsi_xmpp_domain: env::var("JITSI_XMPP_DOMAIN").unwrap_or_else(|_| "meet.jitsi".into()),
         }
     }
 }

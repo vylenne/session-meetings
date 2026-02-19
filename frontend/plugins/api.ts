@@ -2,8 +2,12 @@ export default defineNuxtPlugin(() => {
   const config = useRuntimeConfig();
   const authCookie = useCookie("auth_token");
 
+  const baseURL = import.meta.server
+    ? (config.apiBaseInternal as string)
+    : (config.public.apiBase as string);
+
   const api = $fetch.create({
-    baseURL: config.public.apiBase as string,
+    baseURL,
     onRequest({ options }) {
       if (authCookie.value) {
         const headers = new Headers(options.headers);
