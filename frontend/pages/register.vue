@@ -8,8 +8,23 @@ const form = reactive({ name: "", email: "", password: "", confirmPassword: "" }
 const loading = ref(false);
 const error = ref("");
 
+function safeRedirect(url: string | undefined): string {
+  if (url && url.startsWith("/") && !url.startsWith("//")) return url;
+  return "/dashboard";
+}
+
+function extractErrorMessage(e: unknown, fallback: string): string {
+  if (e && typeof e === "object" && "data" in e) {
+    const data = (e as Record<string, unknown>).data;
+    if (data && typeof data === "object" && "error" in data) {
+      return String((data as Record<string, unknown>).error);
+    }
+  }
+  return fallback;
+}
+
 if (isAuthenticated.value) {
-  navigateTo((route.query.redirect as string) || "/dashboard");
+  navigateTo(safeRedirect(route.query.redirect as string));
 }
 
 async function onSubmit() {
@@ -28,13 +43,9 @@ async function onSubmit() {
   loading.value = true;
   try {
     await register({ name: form.name, email: form.email, password: form.password });
-    navigateTo((route.query.redirect as string) || "/dashboard");
+    navigateTo(safeRedirect(route.query.redirect as string));
   } catch (e: unknown) {
-    const msg =
-      e && typeof e === "object" && "data" in e
-        ? String((e as Record<string, unknown>).data)
-        : "Ошибка регистрации";
-    error.value = msg;
+    error.value = extractErrorMessage(e, "Ошибка регистрации");
   } finally {
     loading.value = false;
   }

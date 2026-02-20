@@ -20,6 +20,7 @@ const props = defineProps<{ meeting: Meeting }>();
 
 const api = useApi();
 const joining = ref(false);
+const joinError = ref("");
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleString("ru-RU", {
@@ -32,6 +33,7 @@ function formatDate(iso: string) {
 }
 
 async function joinMeeting() {
+  joinError.value = "";
   joining.value = true;
   try {
     const data = await api<MeetingDetail>(
@@ -39,6 +41,7 @@ async function joinMeeting() {
     );
     navigateTo(`/meeting/${data.room_name}?jwt=${data.jitsi_jwt}`);
   } catch {
+    joinError.value = "Не удалось войти во встречу";
     joining.value = false;
   }
 }
@@ -67,5 +70,7 @@ async function joinMeeting() {
         </UButton>
       </div>
     </div>
+    <UAlert v-if="joinError" color="error" variant="subtle" :title="joinError"
+      icon="i-lucide-circle-alert" class="mt-3" />
   </UCard>
 </template>

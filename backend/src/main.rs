@@ -8,10 +8,6 @@ mod services;
 
 use actix_cors::Cors;
 use actix_web::{App, HttpResponse, HttpServer, get, web};
-use argon2::password_hash::SaltString;
-use argon2::{Argon2, PasswordHasher};
-use rand::rngs::OsRng;
-use sqlx::PgPool;
 
 use crate::config::AppConfig;
 
@@ -31,9 +27,6 @@ async fn main() -> std::io::Result<()> {
         .run(&pool)
         .await
         .expect("Failed to run migrations");
-
-    // seed test user
-    seed_test_user(&pool).await;
 
     let config_data = web::Data::new(config);
     let pool_data = web::Data::new(pool);
@@ -71,42 +64,6 @@ async fn main() -> std::io::Result<()> {
     .bind(("0.0.0.0", 8080))?
     .run()
     .await
-}
-
-async fn seed_test_user(pool: &PgPool) {
-    let users = [
-        ("test@example.com", "testtest", "Test User"),
-        ("test2@example.com", "testtest", "Test User 2"),
-    ];
-
-    for (email, password, name) in &users {
-        let exists: bool =
-            sqlx::query_scalar("SELECT EXISTS(SELECT 1 FROM users WHERE email = $1)")
-                .bind(email)
-                .fetch_one(pool)
-                .await
-                .unwrap_or(false);
-
-        if exists {
-            continue;
-        }
-
-        let salt = SaltString::generate(&mut OsRng);
-        let password_hash = Argon2::default()
-            .hash_password(password.as_bytes(), &salt)
-            .expect("Failed to hash password")
-            .to_string();
-
-        sqlx::query("INSERT INTO users (email, password_hash, name) VALUES ($1, $2, $3)")
-            .bind(email)
-            .bind(&password_hash)
-            .bind(name)
-            .execute(pool)
-            .await
-            .expect("Failed to seed test user");
-
-        eprintln!("Seeded test user: {email} / {password}");
-    }
 }
 
 #[cfg(test)]

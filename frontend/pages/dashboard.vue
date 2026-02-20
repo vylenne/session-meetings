@@ -26,6 +26,7 @@ const loading = ref(true);
 const creating = ref(false);
 const showNewMeeting = ref(false);
 const newTitle = ref("");
+const createError = ref("");
 
 async function fetchMeetings() {
   loading.value = true;
@@ -39,6 +40,7 @@ async function fetchMeetings() {
 }
 
 async function createMeeting() {
+  createError.value = "";
   creating.value = true;
   try {
     const data = await api<CreateMeetingResponse>("/api/meetings", {
@@ -49,6 +51,7 @@ async function createMeeting() {
     newTitle.value = "";
     navigateTo(`/meeting/${data.room_name}?jwt=${data.jitsi_jwt}`);
   } catch {
+    createError.value = "Не удалось создать встречу";
     creating.value = false;
   }
 }
@@ -93,6 +96,8 @@ onMounted(fetchMeetings);
                   size="lg"
                 />
               </UFormField>
+              <UAlert v-if="createError" color="error" variant="subtle" :title="createError"
+                icon="i-lucide-circle-alert" />
               <div class="flex justify-end gap-2">
                 <UButton variant="ghost" @click="showNewMeeting = false">Отмена</UButton>
                 <UButton type="submit" :loading="creating" icon="i-lucide-video">
