@@ -43,6 +43,10 @@ onMounted(async () => {
 function onReadyToClose() {
   navigateTo('/dashboard')
 }
+
+function onJitsiError(message: string) {
+  error.value = message
+}
 </script>
 
 <template>
@@ -72,6 +76,7 @@ function onReadyToClose() {
         :jwt="jitsiJwt"
         :domain="config.public.jitsiDomain as string"
         @ready-to-close="onReadyToClose"
+        @error="onJitsiError"
       />
       <button
         class="absolute top-4 left-4 z-10 bg-gray-900/80 hover:bg-gray-800 text-white rounded-full p-2 backdrop-blur-sm transition-colors"

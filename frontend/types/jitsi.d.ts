@@ -17,3 +17,7 @@ declare class JitsiMeetExternalAPI {
   removeListener(event: string, listener: (...args: unknown[]) => void): void
   executeCommand(command: string, ...args: unknown[]): void
 }
+
+interface Window {
+  JitsiMeetExternalAPI: typeof JitsiMeetExternalAPI | undefined
+}
